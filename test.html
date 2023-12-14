@@ -1,0 +1,954 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FVCOM: Setting NML</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Times New Roman', Times, serif;
+    }
+    .form-title {
+      color: #000000;
+      font-weight: bold;
+      text-decoration: underline;
+      margin-left: 20px;
+      margin-bottom: 0px;
+      margin-top: 0px;
+    }
+    .form-fill {
+      position: relative;
+      margin-bottom: 0px;
+      display: flex;
+      align-items: center;
+    }
+    .form-fill-label {
+      width: 250px;
+      text-align: right;
+      margin-right: 10px;
+    }
+    .form-select {
+      position: relative;
+      margin-bottom: 0px;
+      display: flex;
+      align-items: center;
+    }
+    .form-select-label {
+      width: 250px;
+      text-align: right;
+      margin-right: 10px;
+    }
+    .flag-select {
+      background-color: #146EB4;
+      position: relative;
+      margin-bottom: 0px;
+      display: flex;
+      align-items: center;
+      position: fixed;
+      top: 40px;
+      left: 0;
+      width: 100%;
+      z-index: 1000;
+    }
+    .flag-select-button {
+      width: auto;
+      text-align: right;
+      margin-left: 10px;
+      margin-right: 15px;
+    }
+    .note {
+      font-size: 14px;
+      color: black;
+      position: relative;
+      top: 0;
+      left: 1%;
+      margin-top: 0;
+    }
+    .file-load-save {
+      background-color: #92a8d1;
+      margin-left: 0px;
+      margin-top: 0px;
+      margin-bottom: 0px;
+      position: fixed;
+      padding: 10px;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 1000;
+    }
+    .file-load-save button{
+      margin-right: 250px;
+    }
+    button {
+      transition-duration: 0.4s;
+      background-color: white;
+      color: black;
+      border: 2px solid #008CBA;
+    }
+    button:hover {
+      background-color: #008CBA;
+      color: white;
+    }
+    :root {
+      --group-background-odd: #588c7e;
+      --group-background-even: #f2e394;
+      --group-background-multiple-of-3: #f2ae72;
+      --group-background-multiple-of-4: #d96459;
+    }
+    .group {
+      padding: 0px;
+    }
+    .hidden {
+      display: none;
+    }
+    .group:nth-child(odd) {
+      background-color: var(--group-background-odd);
+    }
+    .group:nth-child(even) {
+      background-color: var(--group-background-even);
+    }
+    .group:nth-child(3n) {
+      background-color: var(--group-background-multiple-of-3);
+    }
+    .group:nth-child(4n) {
+      background-color: var(--group-background-multiple-of-4);
+    }
+    .content {
+      margin-top: 60px;
+    }
+  </style>
+</head>
+<body>
+  <div class="file-load-save">
+    <button type="button" onclick="loadNML()">Load</button>
+    <input type="text" id="casename" placeholder="Enter case name">
+    <button type="button" onclick="saveNML()">Save</button>
+  </div>
+  <div class="flag-select">
+    <label class="flag-select-button"><input type="checkbox" id="AIR_PRESSURECheckbox" onclick="toggleAIR_PRESSURE()">AIR_PRESSURE</label>
+    <label class="flag-select-button"><input type="checkbox" id="NHCheckbox" onclick="toggleNH()">NH</label>
+    <label class="flag-select-button"><input type="checkbox" id="SEMICheckbox" onclick="toggleSEMI()">SEMI</label>
+    <label class="flag-select-button"><input type="checkbox" id="WAVE_CURRENT_INTERACTIONCheckbox" onclick="toggleWAVE_CURRENT_INTERACTION()">WAVE_CURRENT_INTERACTION</label>
+  </div>
+<div class="content">
+<div class="group" id="NML_CASE">
+  <p class="form-title">&NML_CASE</p>
+  <div class="form-fill">
+    <label class="form-fill-label">CASE_TITLE =</label>
+    <input type="text" id="CASE_TITLE" name="CASE_TITLE" required value="FVCOM">
+    <span class="note">An FVCOM case description</span>
+  </div>
+  <div class="form-fill">
+    <label class="form-fill-label">TIMEZONE =</label>
+    <input type="text" id="TIMEZONE" name="TIMEZONE" required value="NONE">
+    <span class="note">Select Time Zone or for idealized case select NONE</span>
+  </div>
+  <div class="form-fill">
+    <label class="form-fill-label">DATE_FORMAT =</label>
+    <input type="text" id="DATE_FORMAT" name="DATE_FORMAT" required value="YMD">
+    <span class="note">Three-letter string specify date format: YMD or DMY</span>
+  </div>
+  <div class="form-fill">
+    <label class="form-fill-label">DATE_REFERENCE =</label>
+    <input type="text" id="DATE_REFERENCE" name="DATE_REFERENCE" required value="DEFAULT">
+    <span class="note">Reference date (yyyy-mm-dd HH:MM:SS or DEFAULT)</span>
+  </div>
+  <div class="form-fill">
+    <label class="form-fill-label">START_DATE =</label>
+    <input type="text" id="START_DATE" name="START_DATE" required value="">
+    <span class="note">Starting date </span>
+  </div>
+  <div class="form-fill">
+    <label class="form-fill-label">END_DATE =</label>
+    <input type="text" id="END_DATE" name="END_DATE" required value="">
+    <span class="note">Ending date </span>
+  </div>
+/
+</div>
+<div class="group" id="NML_STARTUP">
+  <p class="form-title">&NML_STARTUP</p>
+  <div class="form-select">
+    <label class="form-select-label">STARTUP_TYPE =</label>
+    <input type="radio" id="HOTSTART" name="STARTUP_TYPE" value="HOTSTART" checked>
+    <label for="HOTSTART">HOTSTART</label>
+    <input type="radio" id="COLDSTART" name="STARTUP_TYPE" value="COLDSTART">
+    <label for="COLDSTART">COLDSTART</label>
+    <input type="radio" id="FORECAST" name="STARTUP_TYPE" value="FORECAST">
+    <label for="FORECAST">FORECAST</label>
+    <input type="radio" id="CRASHSTART" name="STARTUP_TYPE" value="CRASHSTART">
+    <label for="CRASHSTART">CRASHSTART</label>
+    <span class="note">Startup type</span>
+  </div>
+  <div class="form-fill">
+    <label class="form-fill-label">STARTUP_FILE =</label>
+    <input type="text" id="STARTUP_FILE" name="STARTUP_FILE" required value="NONE">
+    <span class="note">Restart file name or NONE</span>
+  </div>
+  <div class="form-select">
+    <label class="form-select-label">STARTUP_UV_TYPE =</label>
+    <input type="radio" id="DEFAULT" name="STARTUP_UV_TYPE" value="DEFAULT" checked>
+    <label for="DEFAULT">DEFAULT</label>
+    <input type="radio" id="SET VALUES" name="STARTUP_UV_TYPE" value="SET VALUES">
+    <label for="SET VALUES">SET VALUES</label>
+    <span class="note">Specify the type of the startup u and v values</span>
+  </div>
+  <div class="form-select">
+    <label class="form-select-label">STARTUP_TURB_TYPE =</label>
+    <input type="radio" id="DEFAULT" name="STARTUP_TURB_TYPE" value="DEFAULT" checked>
+    <label for="DEFAULT">DEFAULT</label>
+    <input type="radio" id="SET VALUES" name="STARTUP_TURB_TYPE" value="SET VALUES">
+    <label for="SET VALUES">SET VALUES</label>
+    <span class="note">Specify the types of turbulence mixing values</span>
+  </div>
+  <div class="form-select">
+    <label class="form-select-label">STARTUP_TS_TYPE =</label>
+    <input type="radio" id="CONSTANT" name="STARTUP_TS_TYPE" value="CONSTANT" checked>
+    <label for="CONSTANT">CONSTANT</label>
+    <input type="radio" id="LINEAR" name="STARTUP_TS_TYPE" value="LINEAR">
+    <label for="LINEAR">LINEAR</label>
+    <input type="radio" id="OBSERVED" name="STARTUP_TS_TYPE" value="OBSERVED">
+    <label for="OBSERVED">OBSERVED</label>
+    <input type="radio" id="SET VALUES" name="STARTUP_TS_TYPE" value="SET VALUES">
+    <label for="SET VALUES">SET VALUES</label>
+    <span class="note">Specify the types of the startup T and S</span>
+  </div>
+  <div class="form-fill">
+    <label class="form-fill-label">STARTUP_T_VALS =</label>
+    <input type="text" id="STARTUP_T_VALS" name="STARTUP_T_VALS" required value="-99., -99.">
+    <span class="note">Specify the startup T values</span>
+  </div>
+  <div class="form-fill">
+    <label class="form-fill-label">STARTUP_S_VALS =</label>
+    <input type="text" id="STARTUP_S_VALS" name="STARTUP_S_VALS" required value="-99., -99.">
+    <span class="note">Specify the startup S values</span>
+  </div>
+  <div class="form-fill">
+    <label class="form-fill-label">STARTUP_U_VALS =</label>
+    <input type="text" id="STARTUP_U_VALS" name="STARTUP_U_VALS" required value="-99.">
+    <span class="note">Specify the startup u values</span>
+  </div>
+  <div class="form-fill">
+    <label class="form-fill-label">STARTUP_V_VALS =</label>
+    <input type="text" id="STARTUP_V_VALS" name="STARTUP_V_VALS" required value="-99.">
+    <span class="note">Specify the startup v values</span>
+  </div>
+  <div class="form-fill">
+    <label class="form-fill-label">STARTUP_DMAX =</label>
+    <input type="text" id="STARTUP_DMAX" name="STARTUP_DMAX" required value="-99.">
+    <span class="note">Specify the maximum water depth used in the T and S</span>
+  </div>
+/
+</div>
+<div class="group" id="NML_IO">
+  <p class="form-title">&NML_IO</p>
+  <div class="form-fill">
+    <label class="form-fill-label">INPUT_DIR =</label>
+    <input type="text" id="INPUT_DIR" name="INPUT_DIR" required value="">
+    <span class="note">Path of input files</span>
+  </div>
+  <div class="form-fill">
+    <label class="form-fill-label">OUTPUT_DIR =</label>
+    <input type="text" id="OUTPUT_DIR" name="OUTPUT_DIR" required value="">
+    <span class="note">Path of output files</span>
+  </div>
+  <div class="form-fill">
+    <label class="form-fill-label">IREPORT =</label>
+    <input type="text" id="IREPORT" name="IREPORT" required value="10">
+    <span class="note">Time step # for screen displays of the computted values</span>
+  </div>
+  <div class="form-select">
+    <label class="form-select-label">NAN_CHECK =</label>
+    <input type="radio" id="T" name="NAN_CHECK" value="T">
+    <label for="T">T</label>
+    <input type="radio" id="F" name="NAN_CHECK" value="F" checked>
+    <label for="F">F</label>
+    <span class="note">If to check the basic vairables with NaN every time step</span>
+  </div>
+  <div class="form-select">
+    <label class="form-select-label">VISIT_ALL_VARS =</label>
+    <input type="radio" id="T" name="VISIT_ALL_VARS" value="T">
+    <label for="T">T</label>
+    <input type="radio" id="F" name="VISIT_ALL_VARS" value="F" checked>
+    <label for="F">F</label>
+    <span class="note">If to set up VisIt to monitor the simulating performance</span>
+  </div>
+  <div class="form-select">
+    <label class="form-select-label">WAIT_FOR_VISIT =</label>
+    <input type="radio" id="T" name="WAIT_FOR_VISIT" value="T">
+    <label for="T">T</label>
+    <input type="radio" id="F" name="WAIT_FOR_VISIT" value="F" checked>
+    <label for="F">F</label>
+    <span class="note">If to wait for VisIt to connect before beginning integration</span>
+  </div>
+  <div class="form-select">
+    <label class="form-select-label">USE_MPI_IO_MODE =</label>
+    <input type="radio" id="T" name="USE_MPI_IO_MODE" value="T">
+    <label for="T">T</label>
+    <input type="radio" id="F" name="USE_MPI_IO_MODE" value="F" checked>
+    <label for="F">F</label>
+    <span class="note">If to specify the IO mode for the model output</span>
+  </div>
+  <div class="form-fill">
+    <label class="form-fill-label">IO_PROCESSORS =</label>
+    <input type="text" id="IO_PROCESSORS" name="IO_PROCESSORS" required value="1">
+    <span class="note">Processor # for parrellel IO.</span>
+  </div>
+/
+</div>
+<div class="group" id="NML_INTEGRATION">
+  <p class="form-title">&NML_INTEGRATION</p>
+  <div class="form-fill">
+    <label class="form-fill-label">EXTSTEP_SECONDS =</label>
+    <input type="text" id="EXTSTEP_SECONDS" name="EXTSTEP_SECONDS" required value="0.0">
+    <span class="note">Time step for the external mode (second)</span>
+  </div>
+  <div class="form-fill">
+    <label class="form-fill-label">ISPLIT =</label>
+    <input type="text" id="ISPLIT" name="ISPLIT" required value="0">
+    <span class="note">Ratio of the internal time step to the external one</span>
+  </div>
+  <div class="form-fill hidden">
+    <label class="form-fill-label">INTSTEP_SECONDS =</label>
+    <input type="text" id="INTSTEP_SECONDS" name="INTSTEP_SECONDS" required value="0.0">
+    <span class="note">Time step for semi-implicit shceme (second)</span>
+  </div>
+  <div class="form-fill">
+    <label class="form-fill-label">IRAMP =</label>
+    <input type="text" id="IRAMP" name="IRAMP" required value="5">
+    <span class="note">Time step # used to ramp from the coldstart initial field</span>
+  </div>
+  <div class="form-fill">
+    <label class="form-fill-label">MIN_DEPTH =</label>
+    <input type="text" id="MIN_DEPTH" name="MIN_DEPTH" required value="0.05">
+    <span class="note">Minimum water depth used for the wet/dry treatment (meter)</span>
+  </div>
+  <div class="form-fill">
+    <label class="form-fill-label">STATIC_SSH_ADJ =</label>
+    <input type="text" id="STATIC_SSH_ADJ" name="STATIC_SSH_ADJ" required value="0.0">
+    <span class="note">The static (or reference) depth adjustment (meter)</span>
+  </div>
+  <div class="form-select">
+    <label class="form-select-label">RK_3D_ON =</label>
+    <input type="radio" id="T" name="RK_3D_ON" value="T">
+    <label for="T">T</label>
+    <input type="radio" id="F" name="RK_3D_ON" value="F" checked>
+    <label for="F">F</label>
+    <span class="note">If to turn on Runge-Kutta integration scheme</span>
+  </div>
+/
+</div>
+<div class="group hidden" id="NML_SEMI">
+  <p class="form-title">&NML_SEMI</p>
+  <div class="form-fill hidden">
+    <label class="form-fill-label">IFCETA =</label>
+    <input type="text" id="IFCETA" name="IFCETA" required value="0.55">
+    <span class="note">Implicit factor for the surface pressure gradient term (0-fully explicit; 1-fully implicit)</span>
+  </div>
+  <div class="form-fill hidden">
+    <label class="form-fill-label">BEDF =</label>
+    <input type="text" id="BEDF" name="BEDF" required value="1.0">
+    <span class="note">Factor to enforce a zero normal flux condition at solid boundary</span>
+  </div>
+  <div class="form-fill hidden">
+    <label class="form-fill-label">KSTAGE_UV =</label>
+    <input type="text" id="KSTAGE_UV" name="KSTAGE_UV" required value="1">
+    <span class="note">Factor to set up the Nth step multistage explicit advection scheme to solve the UV advection terms</span>
+  </div>
+  <div class="form-fill hidden">
+    <label class="form-fill-label">KSTAGE_TE =</label>
+    <input type="text" id="KSTAGE_TE" name="KSTAGE_TE" required value="1">
+    <span class="note">Factor to set up the Nth step multistage explicit advection scheme to solve the turbulence advection terms</span>
+  </div>
+  <div class="form-fill hidden">
+    <label class="form-fill-label">KSTAGE_TS =</label>
+    <input type="text" id="KSTAGE_TS" name="KSTAGE_TS" required value="1">
+    <span class="note">Factor to set up the Nth step multistage explicit advection scheme to solve the TS advection terms</span>
+  </div>
+  <div class="form-fill hidden">
+    <label class="form-fill-label">MSTG =</label>
+    <input type="text" id="MSTG" name="MSTG" required value="slow">
+    <span class="note">Flag to control the computational efficiency of the multistage advection scheme. (slow or fast)</span>
+  </div>
+/
+</div>
+<div class="group" id="NML_RESTART">
+  <p class="form-title">&NML_RESTART</p>
+  <div class="form-select">
+    <label class="form-select-label">RST_ON =</label>
+    <input type="radio" id="T" name="RST_ON" value="T">
+    <label for="T">T</label>
+    <input type="radio" id="F" name="RST_ON" value="F" checked>
+    <label for="F">F</label>
+    <span class="note">If to archive restart outputs</span>
+  </div>
+  <div class="form-fill">
+    <label class="form-fill-label">RST_FIRST_OUT =</label>
+    <input type="text" id="RST_FIRST_OUT" name="RST_FIRST_OUT" required value="">
+    <span class="note">Date to start archive restart outputs</span>
+  </div>
+  <div class="form-fill">
+    <label class="form-fill-label">RST_OUT_INTERVAL =</label>
+    <input type="text" id="RST_OUT_INTERVAL" name="RST_OUT_INTERVAL" required value="days=1.">
+    <span class="note">Time interval for restart outputs (seconds=, days=, or cycles=)</span>
+  </div>
+  <div class="form-fill">
+    <label class="form-fill-label">RST_OUTPUT_STACK =</label>
+    <input type="text" id="RST_OUTPUT_STACK" name="RST_OUTPUT_STACK" required value="0">
+    <span class="note">The total time # of each restart output (0 for one single output)</span>
+  </div>
+/
+</div>
+<div class="group" id="NML_NETCDF">
+  <p class="form-title">&NML_NETCDF</p>
+  <div class="form-select">
+    <label class="form-select-label">NC_ON =</label>
+    <input type="radio" id="T" name="NC_ON" value="T" checked>
+    <label for="T">T</label>
+    <input type="radio" id="F" name="NC_ON" value="F">
+    <label for="F">F</label>
+    <span class="note">If to archive history outputs</span>
+  </div>
+  <div class="form-fill">
+    <label class="form-fill-label">NC_FIRST_OUT =</label>
+    <input type="text" id="NC_FIRST_OUT" name="NC_FIRST_OUT" required value="">
+    <span class="note">Date to start archive restart outputs</span>
+  </div>
+  <div class="form-fill">
+    <label class="form-fill-label">NC_OUT_INTERVAL =</label>
+    <input type="text" id="NC_OUT_INTERVAL" name="NC_OUT_INTERVAL" required value="seconds=3600.">
+    <span class="note">Time interval for history outputs (seconds=, days=, or cycles=)</span>
+  </div>
+  <div class="form-fill">
+    <label class="form-fill-label">NC_OUTPUT_STACK =</label>
+    <input type="text" id="NC_OUTPUT_STACK" name="NC_OUTPUT_STACK" required value="0">
+    <span class="note">The total time # of each history output (0 for one single output)</span>
+  </div>
+  <div class="form-fill">
+    <label class="form-fill-label">NC_SUBDOMAIN_FILES =</label>
+    <input type="text" id="NC_SUBDOMAIN_FILES" name="NC_SUBDOMAIN_FILES" required value="FVCOM">
+    <span class="note">Used for the subdomain NetCDF output.</span>
+  </div>
+  <div class="form-select">
+    <label class="form-select-label">NC_GRID_METRICS =</label>
+    <input type="radio" id="T" name="NC_GRID_METRICS" value="T">
+    <label for="T">T</label>
+    <input type="radio" id="F" name="NC_GRID_METRICS" value="F" checked>
+    <label for="F">F</label>
+    <span class="note">If to archive grid metrics</span>
+  </div>
+  <div class="form-select">
+    <label class="form-select-label">NC_FILE_DATE =</label>
+    <input type="radio" id="T" name="NC_FILE_DATE" value="T">
+    <label for="T">T</label>
+    <input type="radio" id="F" name="NC_FILE_DATE" value="F" checked>
+    <label for="F">F</label>
+    <span class="note">If to archive simulating date</span>
+  </div>
+  <div class="form-select">
+    <label class="form-select-label">NC_VELOCITY =</label>
+    <input type="radio" id="T" name="NC_VELOCITY" value="T" checked>
+    <label for="T">T</label>
+    <input type="radio" id="F" name="NC_VELOCITY" value="F">
+    <label for="F">F</label>
+    <span class="note">If to archive 3-D velocity</span>
+  </div>
+  <div class="form-select">
+    <label class="form-select-label">NC_SALT_TEMP =</label>
+    <input type="radio" id="T" name="NC_SALT_TEMP" value="T" checked>
+    <label for="T">T</label>
+    <input type="radio" id="F" name="NC_SALT_TEMP" value="F">
+    <label for="F">F</label>
+    <span class="note">If to archive 3-D temperature and salinity</span>
+  </div>
+  <div class="form-select">
+    <label class="form-select-label">NC_TURBULENCE =</label>
+    <input type="radio" id="T" name="NC_TURBULENCE" value="T" checked>
+    <label for="T">T</label>
+    <input type="radio" id="F" name="NC_TURBULENCE" value="F">
+    <label for="F">F</label>
+    <span class="note">If to archive turbulence variables</span>
+  </div>
+  <div class="form-select">
+    <label class="form-select-label">NC_AVERAGE_VEL =</label>
+    <input type="radio" id="T" name="NC_AVERAGE_VEL" value="T" checked>
+    <label for="T">T</label>
+    <input type="radio" id="F" name="NC_AVERAGE_VEL" value="F">
+    <label for="F">F</label>
+    <span class="note">If to archive 2-D velocity</span>
+  </div>
+  <div class="form-select">
+    <label class="form-select-label">NC_VERTICAL_VEL =</label>
+    <input type="radio" id="T" name="NC_VERTICAL_VEL" value="T" checked>
+    <label for="T">T</label>
+    <input type="radio" id="F" name="NC_VERTICAL_VEL" value="F">
+    <label for="F">F</label>
+    <span class="note">If to archive 3-D vertical velocity</span>
+  </div>
+  <div class="form-select hidden">
+    <label class="form-select-label">NC_NH_QP =</label>
+    <input type="radio" id="T" name="NC_NH_QP" value="T">
+    <label for="T">T</label>
+    <input type="radio" id="F" name="NC_NH_QP" value="F" checked>
+    <label for="F">F</label>
+    <span class="note">If to archive non-hydrostatic pressure</span>
+  </div>
+  <div class="form-select hidden">
+    <label class="form-select-label">NC_NH_RHS =</label>
+    <input type="radio" id="T" name="NC_NH_RHS" value="T">
+    <label for="T">T</label>
+    <input type="radio" id="F" name="NC_NH_RHS" value="F" checked>
+    <label for="F">F</label>
+    <span class="note">If to archive right-hand side terms of the Poisson equation for the non-hydrostatic pressure</span>
+  </div>
+  <div class="form-select">
+    <label class="form-select-label">NC_WIND_VEL =</label>
+    <input type="radio" id="T" name="NC_WIND_VEL" value="T">
+    <label for="T">T</label>
+    <input type="radio" id="F" name="NC_WIND_VEL" value="F" checked>
+    <label for="F">F</label>
+    <span class="note">If to archive wind velocity</span>
+  </div>
+  <div class="form-select">
+    <label class="form-select-label">NC_WIND_STRESS =</label>
+    <input type="radio" id="T" name="NC_WIND_STRESS" value="T">
+    <label for="T">T</label>
+    <input type="radio" id="F" name="NC_WIND_STRESS" value="F" checked>
+    <label for="F">F</label>
+    <span class="note">If to archive wind stress</span>
+  </div>
+  <div class="form-select hidden">
+    <label class="form-select-label">NC_ATM_PRESS =</label>
+    <input type="radio" id="T" name="NC_ATM_PRESS" value="T">
+    <label for="T">T</label>
+    <input type="radio" id="F" name="NC_ATM_PRESS" value="F" checked>
+    <label for="F">F</label>
+    <span class="note">If to archive air pressure</span>
+  </div>
+  <div class="form-select hidden">
+    <label class="form-select-label">NC_WAVE_PARA =</label>
+    <input type="radio" id="T" name="NC_WAVE_PARA" value="T" checked>
+    <label for="T">T</label>
+    <input type="radio" id="F" name="NC_WAVE_PARA" value="F">
+    <label for="F">F</label>
+    <span class="note">If to archive wave parameters</span>
+  </div>
+/
+</div>
+</div>
+  <script>
+    function toggleAIR_PRESSURE() {
+      const AIR_PRESSURECheckbox = document.getElementById("AIR_PRESSURECheckbox");
+      const NC_ATM_PRESS = document.querySelector('input[name="NC_ATM_PRESS"]');
+      if (AIR_PRESSURECheckbox.checked) {
+        NC_ATM_PRESS.parentElement.classList.remove("hidden");
+      } else {
+        NC_ATM_PRESS.parentElement.classList.add("hidden");
+      }
+    }
+    function toggleNH() {
+      const NHCheckbox = document.getElementById("NHCheckbox");
+      const NC_NH_QP = document.querySelector('input[name="NC_NH_QP"]');
+      const NC_NH_RHS = document.querySelector('input[name="NC_NH_RHS"]');
+      if (NHCheckbox.checked) {
+        NC_NH_QP.parentElement.classList.remove("hidden");
+        NC_NH_RHS.parentElement.classList.remove("hidden");
+      } else {
+        NC_NH_QP.parentElement.classList.add("hidden");
+        NC_NH_RHS.parentElement.classList.add("hidden");
+      }
+    }
+    function toggleSEMI() {
+      const SEMICheckbox = document.getElementById("SEMICheckbox");
+      const INTSTEP_SECONDS = document.getElementById("INTSTEP_SECONDS");
+      const IFCETA = document.getElementById("IFCETA");
+      const BEDF = document.getElementById("BEDF");
+      const KSTAGE_UV = document.getElementById("KSTAGE_UV");
+      const KSTAGE_TE = document.getElementById("KSTAGE_TE");
+      const KSTAGE_TS = document.getElementById("KSTAGE_TS");
+      const MSTG = document.getElementById("MSTG");
+      const EXTSTEP_SECONDS = document.getElementById("EXTSTEP_SECONDS");
+      const ISPLIT = document.getElementById("ISPLIT");
+      const NML_SEMI = document.getElementById("NML_SEMI");
+      const NML_SEMI_ELEMENTS = NML_SEMI.querySelectorAll(".form-fill.hidden");
+      if (SEMICheckbox.checked) {
+        INTSTEP_SECONDS.parentElement.classList.remove("hidden");
+        IFCETA.parentElement.classList.remove("hidden");
+        BEDF.parentElement.classList.remove("hidden");
+        KSTAGE_UV.parentElement.classList.remove("hidden");
+        KSTAGE_TE.parentElement.classList.remove("hidden");
+        KSTAGE_TS.parentElement.classList.remove("hidden");
+        MSTG.parentElement.classList.remove("hidden");
+        EXTSTEP_SECONDS.parentElement.classList.add("hidden");
+        ISPLIT.parentElement.classList.add("hidden");
+        NML_SEMI.classList.remove("hidden");
+        NML_SEMI_ELEMENTS.forEach((el) => el.classList.remove("hidden"));
+      } else {
+        INTSTEP_SECONDS.parentElement.classList.add("hidden");
+        IFCETA.parentElement.classList.add("hidden");
+        BEDF.parentElement.classList.add("hidden");
+        KSTAGE_UV.parentElement.classList.add("hidden");
+        KSTAGE_TE.parentElement.classList.add("hidden");
+        KSTAGE_TS.parentElement.classList.add("hidden");
+        MSTG.parentElement.classList.add("hidden");
+        EXTSTEP_SECONDS.parentElement.classList.remove("hidden");
+        ISPLIT.parentElement.classList.remove("hidden");
+        NML_SEMI.classList.add("hidden");
+        NML_SEMI_ELEMENTS.forEach((el) => el.classList.add("hidden"));
+      }
+    }
+    function toggleWAVE_CURRENT_INTERACTION() {
+      const WAVE_CURRENT_INTERACTIONCheckbox = document.getElementById("WAVE_CURRENT_INTERACTIONCheckbox");
+      const NC_WAVE_PARA = document.querySelector('input[name="NC_WAVE_PARA"]');
+      if (WAVE_CURRENT_INTERACTIONCheckbox.checked) {
+        NC_WAVE_PARA.parentElement.classList.remove("hidden");
+      } else {
+        NC_WAVE_PARA.parentElement.classList.add("hidden");
+      }
+    }
+    async function saveNML() {
+      const casename = document.getElementById("casename").value || "casename";
+      const CASE_TITLE = document.getElementById("CASE_TITLE").value;
+      const TIMEZONE = document.getElementById("TIMEZONE").value;
+      const DATE_FORMAT = document.getElementById("DATE_FORMAT").value;
+      const DATE_REFERENCE = document.getElementById("DATE_REFERENCE").value;
+      const START_DATE = document.getElementById("START_DATE").value;
+      const END_DATE = document.getElementById("END_DATE").value;
+      const STARTUP_TYPE = document.querySelector('input[name="STARTUP_TYPE"]:checked').value;
+      const STARTUP_FILE = document.getElementById("STARTUP_FILE").value;
+      const STARTUP_UV_TYPE = document.querySelector('input[name="STARTUP_UV_TYPE"]:checked').value;
+      const STARTUP_TURB_TYPE = document.querySelector('input[name="STARTUP_TURB_TYPE"]:checked').value;
+      const STARTUP_TS_TYPE = document.querySelector('input[name="STARTUP_TS_TYPE"]:checked').value;
+      const STARTUP_T_VALS = document.getElementById("STARTUP_T_VALS").value;
+      const STARTUP_S_VALS = document.getElementById("STARTUP_S_VALS").value;
+      const STARTUP_U_VALS = document.getElementById("STARTUP_U_VALS").value;
+      const STARTUP_V_VALS = document.getElementById("STARTUP_V_VALS").value;
+      const STARTUP_DMAX = document.getElementById("STARTUP_DMAX").value;
+      const INPUT_DIR = document.getElementById("INPUT_DIR").value;
+      const OUTPUT_DIR = document.getElementById("OUTPUT_DIR").value;
+      const IREPORT = document.getElementById("IREPORT").value;
+      const NAN_CHECK = document.querySelector('input[name="NAN_CHECK"]:checked').value;
+      const VISIT_ALL_VARS = document.querySelector('input[name="VISIT_ALL_VARS"]:checked').value;
+      const WAIT_FOR_VISIT = document.querySelector('input[name="WAIT_FOR_VISIT"]:checked').value;
+      const USE_MPI_IO_MODE = document.querySelector('input[name="USE_MPI_IO_MODE"]:checked').value;
+      const IO_PROCESSORS = document.getElementById("IO_PROCESSORS").value;
+      const isEXTSTEP_SECONDSHidden = document.getElementById("EXTSTEP_SECONDS").parentElement.classList.contains("hidden");
+      const EXTSTEP_SECONDS = document.getElementById("EXTSTEP_SECONDS").value;
+      const isISPLITHidden = document.getElementById("ISPLIT").parentElement.classList.contains("hidden");
+      const ISPLIT = document.getElementById("ISPLIT").value;
+      const isINTSTEP_SECONDSHidden = document.getElementById("INTSTEP_SECONDS").parentElement.classList.contains("hidden");
+      const INTSTEP_SECONDS = document.getElementById("INTSTEP_SECONDS").value;
+      const IRAMP = document.getElementById("IRAMP").value;
+      const MIN_DEPTH = document.getElementById("MIN_DEPTH").value;
+      const STATIC_SSH_ADJ = document.getElementById("STATIC_SSH_ADJ").value;
+      const RK_3D_ON = document.querySelector('input[name="RK_3D_ON"]:checked').value;
+      const isNML_SEMIHidden = document.getElementById("NML_SEMI").classList.contains("hidden");
+      const isIFCETAHidden = document.getElementById("IFCETA").parentElement.classList.contains("hidden");
+      const IFCETA = document.getElementById("IFCETA").value;
+      const isBEDFHidden = document.getElementById("BEDF").parentElement.classList.contains("hidden");
+      const BEDF = document.getElementById("BEDF").value;
+      const isKSTAGE_UVHidden = document.getElementById("KSTAGE_UV").parentElement.classList.contains("hidden");
+      const KSTAGE_UV = document.getElementById("KSTAGE_UV").value;
+      const isKSTAGE_TEHidden = document.getElementById("KSTAGE_TE").parentElement.classList.contains("hidden");
+      const KSTAGE_TE = document.getElementById("KSTAGE_TE").value;
+      const isKSTAGE_TSHidden = document.getElementById("KSTAGE_TS").parentElement.classList.contains("hidden");
+      const KSTAGE_TS = document.getElementById("KSTAGE_TS").value;
+      const isMSTGHidden = document.getElementById("MSTG").parentElement.classList.contains("hidden");
+      const MSTG = document.getElementById("MSTG").value;
+      const RST_ON = document.querySelector('input[name="RST_ON"]:checked').value;
+      const RST_FIRST_OUT = document.getElementById("RST_FIRST_OUT").value;
+      const RST_OUT_INTERVAL = document.getElementById("RST_OUT_INTERVAL").value;
+      const RST_OUTPUT_STACK = document.getElementById("RST_OUTPUT_STACK").value;
+      const NC_ON = document.querySelector('input[name="NC_ON"]:checked').value;
+      const NC_FIRST_OUT = document.getElementById("NC_FIRST_OUT").value;
+      const NC_OUT_INTERVAL = document.getElementById("NC_OUT_INTERVAL").value;
+      const NC_OUTPUT_STACK = document.getElementById("NC_OUTPUT_STACK").value;
+      const NC_SUBDOMAIN_FILES = document.getElementById("NC_SUBDOMAIN_FILES").value;
+      const NC_GRID_METRICS = document.querySelector('input[name="NC_GRID_METRICS"]:checked').value;
+      const NC_FILE_DATE = document.querySelector('input[name="NC_FILE_DATE"]:checked').value;
+      const NC_VELOCITY = document.querySelector('input[name="NC_VELOCITY"]:checked').value;
+      const NC_SALT_TEMP = document.querySelector('input[name="NC_SALT_TEMP"]:checked').value;
+      const NC_TURBULENCE = document.querySelector('input[name="NC_TURBULENCE"]:checked').value;
+      const NC_AVERAGE_VEL = document.querySelector('input[name="NC_AVERAGE_VEL"]:checked').value;
+      const NC_VERTICAL_VEL = document.querySelector('input[name="NC_VERTICAL_VEL"]:checked').value;
+      const isNC_NH_QPHidden = document.querySelector('input[name="NC_NH_QP"]').parentElement.classList.contains("hidden");
+      const NC_NH_QP = document.querySelector('input[name="NC_NH_QP"]:checked').value;
+      const isNC_NH_RHSHidden = document.querySelector('input[name="NC_NH_RHS"]').parentElement.classList.contains("hidden");
+      const NC_NH_RHS = document.querySelector('input[name="NC_NH_RHS"]:checked').value;
+      const NC_WIND_VEL = document.querySelector('input[name="NC_WIND_VEL"]:checked').value;
+      const NC_WIND_STRESS = document.querySelector('input[name="NC_WIND_STRESS"]:checked').value;
+      const isNC_ATM_PRESSHidden = document.querySelector('input[name="NC_ATM_PRESS"]').parentElement.classList.contains("hidden");
+      const NC_ATM_PRESS = document.querySelector('input[name="NC_ATM_PRESS"]:checked').value;
+      const isNC_WAVE_PARAHidden = document.querySelector('input[name="NC_WAVE_PARA"]').parentElement.classList.contains("hidden");
+      const NC_WAVE_PARA = document.querySelector('input[name="NC_WAVE_PARA"]:checked').value;
+      const formData = `!-----------------------------------------------------------------------!
+!  _________    ____   ____       ______        ____      ____    ____  !
+! |_   ___  |  |_  _| |_  _|    .' ___  |     .'    '.   |_   \\  /   _| !
+!   | |_  \\_|    \\ \\   / /     / .'   \\_|    /  .--.  \\    |   \\/   |   !
+!   |  _|         \\ \\ / /      | |           | |    | |    | |\\  /| |   !
+!  _| |_           \\ ' /       \\ \`.___.'\\    \\  \`--'  /   _| |_\\/_| |_  !
+! |_____|           \\_/         \`._____.'     \`.____.'   |_____||_____| !
+!                                                                       !
+!-----------------------------------------------------------------------!
+&NML_CASE
+           CASE_TITLE = ${CASE_TITLE}
+             TIMEZONE = ${TIMEZONE}
+          DATE_FORMAT = ${DATE_FORMAT}
+       DATE_REFERENCE = ${DATE_REFERENCE}
+           START_DATE = ${START_DATE}
+             END_DATE = ${END_DATE}
+/
+&NML_STARTUP
+         STARTUP_TYPE = ${STARTUP_TYPE}
+         STARTUP_FILE = ${STARTUP_FILE}
+      STARTUP_UV_TYPE = ${STARTUP_UV_TYPE}
+    STARTUP_TURB_TYPE = ${STARTUP_TURB_TYPE}
+      STARTUP_TS_TYPE = ${STARTUP_TS_TYPE}
+       STARTUP_T_VALS = ${STARTUP_T_VALS}
+       STARTUP_S_VALS = ${STARTUP_S_VALS}
+       STARTUP_U_VALS = ${STARTUP_U_VALS}
+       STARTUP_V_VALS = ${STARTUP_V_VALS}
+         STARTUP_DMAX = ${STARTUP_DMAX}
+/
+&NML_IO
+            INPUT_DIR = ${INPUT_DIR}
+           OUTPUT_DIR = ${OUTPUT_DIR}
+              IREPORT = ${IREPORT}
+            NAN_CHECK = ${NAN_CHECK}
+       VISIT_ALL_VARS = ${VISIT_ALL_VARS}
+       WAIT_FOR_VISIT = ${WAIT_FOR_VISIT}
+      USE_MPI_IO_MODE = ${USE_MPI_IO_MODE}
+        IO_PROCESSORS = ${IO_PROCESSORS}
+/
+&NML_INTEGRATION
+ ${isEXTSTEP_SECONDSHidden ? '' : `     EXTSTEP_SECONDS = ${EXTSTEP_SECONDS}`}
+ ${isISPLITHidden ? '' : `              ISPLIT = ${ISPLIT}`}
+ ${isINTSTEP_SECONDSHidden ? '' : `     INTSTEP_SECONDS = ${INTSTEP_SECONDS}`}
+                IRAMP = ${IRAMP}
+            MIN_DEPTH = ${MIN_DEPTH}
+       STATIC_SSH_ADJ = ${STATIC_SSH_ADJ}
+             RK_3D_ON = ${RK_3D_ON}
+/
+ ${isNML_SEMIHidden ? '' : `&NML_SEMI`}
+ ${isIFCETAHidden ? '' : `              IFCETA = ${IFCETA}`}
+ ${isBEDFHidden ? '' : `                BEDF = ${BEDF}`}
+ ${isKSTAGE_UVHidden ? '' : `           KSTAGE_UV = ${KSTAGE_UV}`}
+ ${isKSTAGE_TEHidden ? '' : `           KSTAGE_TE = ${KSTAGE_TE}`}
+ ${isKSTAGE_TSHidden ? '' : `           KSTAGE_TS = ${KSTAGE_TS}`}
+ ${isMSTGHidden ? '' : `                MSTG = ${MSTG}`}
+ ${isNML_SEMIHidden ? '' : `/`}
+&NML_RESTART
+               RST_ON = ${RST_ON}
+        RST_FIRST_OUT = ${RST_FIRST_OUT}
+     RST_OUT_INTERVAL = ${RST_OUT_INTERVAL}
+     RST_OUTPUT_STACK = ${RST_OUTPUT_STACK}
+/
+&NML_NETCDF
+                NC_ON = ${NC_ON}
+         NC_FIRST_OUT = ${NC_FIRST_OUT}
+      NC_OUT_INTERVAL = ${NC_OUT_INTERVAL}
+      NC_OUTPUT_STACK = ${NC_OUTPUT_STACK}
+   NC_SUBDOMAIN_FILES = ${NC_SUBDOMAIN_FILES}
+      NC_GRID_METRICS = ${NC_GRID_METRICS}
+         NC_FILE_DATE = ${NC_FILE_DATE}
+          NC_VELOCITY = ${NC_VELOCITY}
+         NC_SALT_TEMP = ${NC_SALT_TEMP}
+        NC_TURBULENCE = ${NC_TURBULENCE}
+       NC_AVERAGE_VEL = ${NC_AVERAGE_VEL}
+      NC_VERTICAL_VEL = ${NC_VERTICAL_VEL}
+ ${isNC_NH_QPHidden ? '' : `            NC_NH_QP = ${NC_NH_QP}`}
+ ${isNC_NH_RHSHidden ? '' : `           NC_NH_RHS = ${NC_NH_RHS}`}
+          NC_WIND_VEL = ${NC_WIND_VEL}
+       NC_WIND_STRESS = ${NC_WIND_STRESS}
+ ${isNC_ATM_PRESSHidden ? '' : `        NC_ATM_PRESS = ${NC_ATM_PRESS}`}
+ ${isNC_WAVE_PARAHidden ? '' : `        NC_WAVE_PARA = ${NC_WAVE_PARA}`}
+/
+      `.replace(/\n\s*\n/g, '\n');
+      try {
+        const handle = await window.showSaveFilePicker({
+          suggestedName:  `${casename}_run.nml`,
+          types: [{
+            description: 'NML Files',
+            accept: { 'text/plain': ['.nml'] },
+          }],
+        });
+        const writable = await handle.createWritable();
+        await writable.write(formData);
+        await writable.close();
+        console.log('File saved successfully!');
+      } catch (error) {
+        console.error('Error saving file:', error);
+      }
+    }
+    async function loadNML() {
+      try {
+        const [fileHandle] = await window.showOpenFilePicker({
+          types: [{
+            description: 'NML Files',
+            accept: { 'text/plain': ['.nml'] },
+          }],
+        });
+        const file = await fileHandle.getFile();
+        const content = await file.text();
+        readNML(content);
+        console.log('File loaded successfully!');
+      } catch (error) {
+        console.error('Error loading file:', error);
+      }
+    }
+    function readNML(data) {
+      const lines = data.split('\n');
+      const formData = {};
+      lines.forEach(line => {
+        if (line.trim().startsWith('!')) {
+          return;
+        }
+        const keyValue = line.split('=', 2);
+        if (keyValue.length === 2) {
+          const [key, value] = keyValue.map(item => item.trim());
+          formData[key] = value;
+        }
+      });
+      document.getElementById('CASE_TITLE').value = formData.CASE_TITLE || '';
+      document.getElementById('TIMEZONE').value = formData.TIMEZONE || '';
+      document.getElementById('DATE_FORMAT').value = formData.DATE_FORMAT || '';
+      document.getElementById('DATE_REFERENCE').value = formData.DATE_REFERENCE || '';
+      document.getElementById('START_DATE').value = formData.START_DATE || '';
+      document.getElementById('END_DATE').value = formData.END_DATE || '';
+      const STARTUP_TYPERadio = formData.STARTUP_TYPE === 'HOTSTART'
+        ? document.getElementById('HOTSTART')
+        : formData.STARTUP_TYPE=== 'COLDSTART'
+          ? document.getElementById('COLDSTART')
+          : formData.STARTUP_TYPE=== 'FORECAST'
+            ? document.getElementById('FORECAST')
+            : document.getElementById('CRASHSTART');
+      if (STARTUP_TYPERadio) {STARTUP_TYPERadio.checked = true;}
+      document.getElementById('STARTUP_FILE').value = formData.STARTUP_FILE || '';
+      const STARTUP_UV_TYPERadio = formData.STARTUP_UV_TYPE === 'DEFAULT'
+        ? document.getElementById('DEFAULT')
+        : document.getElementById('SET VALUES');
+      if (STARTUP_UV_TYPERadio) {STARTUP_UV_TYPERadio.checked = true;}
+      const STARTUP_TURB_TYPERadio = formData.STARTUP_TURB_TYPE === 'DEFAULT'
+        ? document.getElementById('DEFAULT')
+        : document.getElementById('SET VALUES');
+      if (STARTUP_TURB_TYPERadio) {STARTUP_TURB_TYPERadio.checked = true;}
+      const STARTUP_TS_TYPERadio = formData.STARTUP_TS_TYPE === 'CONSTANT'
+        ? document.getElementById('CONSTANT')
+        : formData.STARTUP_TS_TYPE=== 'LINEAR'
+          ? document.getElementById('LINEAR')
+          : formData.STARTUP_TS_TYPE=== 'OBSERVED'
+            ? document.getElementById('OBSERVED')
+            : document.getElementById('SET VALUES');
+      if (STARTUP_TS_TYPERadio) {STARTUP_TS_TYPERadio.checked = true;}
+      document.getElementById('STARTUP_T_VALS').value = formData.STARTUP_T_VALS || '';
+      document.getElementById('STARTUP_S_VALS').value = formData.STARTUP_S_VALS || '';
+      document.getElementById('STARTUP_U_VALS').value = formData.STARTUP_U_VALS || '';
+      document.getElementById('STARTUP_V_VALS').value = formData.STARTUP_V_VALS || '';
+      document.getElementById('STARTUP_DMAX').value = formData.STARTUP_DMAX || '';
+      document.getElementById('INPUT_DIR').value = formData.INPUT_DIR || '';
+      document.getElementById('OUTPUT_DIR').value = formData.OUTPUT_DIR || '';
+      document.getElementById('IREPORT').value = formData.IREPORT || '';
+      const NAN_CHECKRadio = formData.NAN_CHECK === 'T'
+        ? document.getElementById('T')
+        : document.getElementById('F');
+      if (NAN_CHECKRadio) {NAN_CHECKRadio.checked = true;}
+      const VISIT_ALL_VARSRadio = formData.VISIT_ALL_VARS === 'T'
+        ? document.getElementById('T')
+        : document.getElementById('F');
+      if (VISIT_ALL_VARSRadio) {VISIT_ALL_VARSRadio.checked = true;}
+      const WAIT_FOR_VISITRadio = formData.WAIT_FOR_VISIT === 'T'
+        ? document.getElementById('T')
+        : document.getElementById('F');
+      if (WAIT_FOR_VISITRadio) {WAIT_FOR_VISITRadio.checked = true;}
+      const USE_MPI_IO_MODERadio = formData.USE_MPI_IO_MODE === 'T'
+        ? document.getElementById('T')
+        : document.getElementById('F');
+      if (USE_MPI_IO_MODERadio) {USE_MPI_IO_MODERadio.checked = true;}
+      document.getElementById('IO_PROCESSORS').value = formData.IO_PROCESSORS || '';
+      document.getElementById('EXTSTEP_SECONDS').value = formData.EXTSTEP_SECONDS || '';
+      document.getElementById('ISPLIT').value = formData.ISPLIT || '';
+      document.getElementById('INTSTEP_SECONDS').value = formData.INTSTEP_SECONDS || '';
+      document.getElementById('IRAMP').value = formData.IRAMP || '';
+      document.getElementById('MIN_DEPTH').value = formData.MIN_DEPTH || '';
+      document.getElementById('STATIC_SSH_ADJ').value = formData.STATIC_SSH_ADJ || '';
+      const RK_3D_ONRadio = formData.RK_3D_ON === 'T'
+        ? document.getElementById('T')
+        : document.getElementById('F');
+      if (RK_3D_ONRadio) {RK_3D_ONRadio.checked = true;}
+      document.getElementById('IFCETA').value = formData.IFCETA || '';
+      document.getElementById('BEDF').value = formData.BEDF || '';
+      document.getElementById('KSTAGE_UV').value = formData.KSTAGE_UV || '';
+      document.getElementById('KSTAGE_TE').value = formData.KSTAGE_TE || '';
+      document.getElementById('KSTAGE_TS').value = formData.KSTAGE_TS || '';
+      document.getElementById('MSTG').value = formData.MSTG || '';
+      const RST_ONRadio = formData.RST_ON === 'T'
+        ? document.getElementById('T')
+        : document.getElementById('F');
+      if (RST_ONRadio) {RST_ONRadio.checked = true;}
+      document.getElementById('RST_FIRST_OUT').value = formData.RST_FIRST_OUT || '';
+      document.getElementById('RST_OUT_INTERVAL').value = formData.RST_OUT_INTERVAL || '';
+      document.getElementById('RST_OUTPUT_STACK').value = formData.RST_OUTPUT_STACK || '';
+      const NC_ONRadio = formData.NC_ON === 'T'
+        ? document.getElementById('T')
+        : document.getElementById('F');
+      if (NC_ONRadio) {NC_ONRadio.checked = true;}
+      document.getElementById('NC_FIRST_OUT').value = formData.NC_FIRST_OUT || '';
+      document.getElementById('NC_OUT_INTERVAL').value = formData.NC_OUT_INTERVAL || '';
+      document.getElementById('NC_OUTPUT_STACK').value = formData.NC_OUTPUT_STACK || '';
+      document.getElementById('NC_SUBDOMAIN_FILES').value = formData.NC_SUBDOMAIN_FILES || '';
+      const NC_GRID_METRICSRadio = formData.NC_GRID_METRICS === 'T'
+        ? document.getElementById('T')
+        : document.getElementById('F');
+      if (NC_GRID_METRICSRadio) {NC_GRID_METRICSRadio.checked = true;}
+      const NC_FILE_DATERadio = formData.NC_FILE_DATE === 'T'
+        ? document.getElementById('T')
+        : document.getElementById('F');
+      if (NC_FILE_DATERadio) {NC_FILE_DATERadio.checked = true;}
+      const NC_VELOCITYRadio = formData.NC_VELOCITY === 'T'
+        ? document.getElementById('T')
+        : document.getElementById('F');
+      if (NC_VELOCITYRadio) {NC_VELOCITYRadio.checked = true;}
+      const NC_SALT_TEMPRadio = formData.NC_SALT_TEMP === 'T'
+        ? document.getElementById('T')
+        : document.getElementById('F');
+      if (NC_SALT_TEMPRadio) {NC_SALT_TEMPRadio.checked = true;}
+      const NC_TURBULENCERadio = formData.NC_TURBULENCE === 'T'
+        ? document.getElementById('T')
+        : document.getElementById('F');
+      if (NC_TURBULENCERadio) {NC_TURBULENCERadio.checked = true;}
+      const NC_AVERAGE_VELRadio = formData.NC_AVERAGE_VEL === 'T'
+        ? document.getElementById('T')
+        : document.getElementById('F');
+      if (NC_AVERAGE_VELRadio) {NC_AVERAGE_VELRadio.checked = true;}
+      const NC_VERTICAL_VELRadio = formData.NC_VERTICAL_VEL === 'T'
+        ? document.getElementById('T')
+        : document.getElementById('F');
+      if (NC_VERTICAL_VELRadio) {NC_VERTICAL_VELRadio.checked = true;}
+      const NC_NH_QPRadio = formData.NC_NH_QP === 'T'
+        ? document.getElementById('T')
+        : document.getElementById('F');
+      if (NC_NH_QPRadio) {NC_NH_QPRadio.checked = true;}
+      const NC_NH_RHSRadio = formData.NC_NH_RHS === 'T'
+        ? document.getElementById('T')
+        : document.getElementById('F');
+      if (NC_NH_RHSRadio) {NC_NH_RHSRadio.checked = true;}
+      const NC_WIND_VELRadio = formData.NC_WIND_VEL === 'T'
+        ? document.getElementById('T')
+        : document.getElementById('F');
+      if (NC_WIND_VELRadio) {NC_WIND_VELRadio.checked = true;}
+      const NC_WIND_STRESSRadio = formData.NC_WIND_STRESS === 'T'
+        ? document.getElementById('T')
+        : document.getElementById('F');
+      if (NC_WIND_STRESSRadio) {NC_WIND_STRESSRadio.checked = true;}
+      const NC_ATM_PRESSRadio = formData.NC_ATM_PRESS === 'T'
+        ? document.getElementById('T')
+        : document.getElementById('F');
+      if (NC_ATM_PRESSRadio) {NC_ATM_PRESSRadio.checked = true;}
+      const NC_WAVE_PARARadio = formData.NC_WAVE_PARA === 'T'
+        ? document.getElementById('T')
+        : document.getElementById('F');
+      if (NC_WAVE_PARARadio) {NC_WAVE_PARARadio.checked = true;}
+      document.getElementById('casename').value = formData.Casename || '';
+    }
+    </script>
+  </body>
+</html>
